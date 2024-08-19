@@ -1,0 +1,310 @@
+var
+ adminForm:TclForm;
+ bookCategoryBox : TclComboBox;
+ combo1: TClComboBox;
+ usernameLbl, booknameLbl,authorLbl, pageLbl: TClProLabel;
+ welcomeLbl,comboBoxLbl :TClProLabel;
+ bookNameEdt, usernameEdt2,authorEdt,pageEdt: TclProEdit;
+ adminPanel:TclProPanel;
+ submitBtn: TClProButton;
+ qrySubmit : TclSQLiteQuery;
+ database, Password1 : String;
+ 
+ 
+ void combo1DataLoad
+{
+  try
+    // Azure SQL veritabanına bağlantı kur
+    Clomosy.DBSQLiteConnect(Clomosy.AppFilesPath + 'ClomosyDatabase1.db3', '');
+
+
+    // Veritabanından şehir bilgilerini çek
+    qrySubmit = Clomosy.DBSQLiteQueryWith('SELECT Username, Email FROM Category');
+    qrySubmit.OpenOrExecute;
+
+    // Gelen verileri ComboBox'a ekle
+    while (not qrySubmit.Eof)
+    {
+      Combo1.AddItem(
+        qrySubmit.FieldByName('Username').AsString, 
+        qrySubmit.FieldByName('Email').AsString
+      );
+      qrySubmit.Next;
+    }
+  finally
+    qrySubmit.Free;  // Bellek sızıntısını önlemek için sorguyu serbest bırak
+  }
+}
+ 
+ 
+void CreateTableBooks;
+{
+  database = Clomosy.AppFilesPath + 'ClomosyDatabase1.db3';  // Veritabanı dosyasının yolu
+  Password1 = '';  // Veritabanı şifresi (boş bırakılmış)
+
+  try
+  {
+    // Veritabanına bağlanma
+    Clomosy.DBSQLiteConnect(database, Password1);
+    
+    // SQL sorgusu ile tablo oluşturma
+    Clomosy.DBSQLiteQuery.Sql.Text = 
+      'CREATE TABLE IF NOT EXISTS Book2 (
+      BookID INTEGER PRIMARY KEY AUTOINCREMENT, 
+      BookType TEXT NOT NULL, 
+      Username1 TEXT NOT NULL, 
+      BookName TEXT NOT NULL, 
+      AuthorName TEXT NOT NULL, 
+      NmbPage FLOAT NOT NULL)';
+    Clomosy.DBSQLiteQuery.OpenOrExecute;
+    
+    // İşlem başarılı olursa mesaj gösterme
+  }
+  except
+    // Hata durumunda hata mesajını gösterme
+    ShowMessage('Exception Class: ' + LastExceptionClassName + ' Exception Message: ' + LastExceptionMessage);
+  }
+}
+
+void SaveButtonClick;
+{
+  try
+  {
+    Clomosy.DBSQLiteQuery.SQL.Text = 
+      'INSERT INTO Book2 (BookType, Username1, BookName, AuthorName, NmbPage) VALUES (' +QuotedStr(bookCategoryBox.Text) + ', ' + QuotedStr(Combo1.Text) + ', ' + QuotedStr(bookNameEdt.Text) + ', ' +  QuotedStr(authorEdt.Text) + ', ' +QuotedStr(pageEdt.Text) + ')';
+      
+    Clomosy.DBSQLiteQuery.OpenOrExecute;
+    ShowMessage('New Book Details Has Added!');
+  }
+  except
+    ShowMessage('Exception class: ' + LastExceptionClassName + ' Exception Message: ' + LastExceptionMessage);
+  } 
+}
+
+
+
+{
+ adminForm = TclForm.Create(Self);
+ 
+ 
+
+ adminPanel = adminForm.AddNewProPanel(adminForm,'adminPanel');
+ adminPanel.Align = alClient;
+ adminForm.SetFormBGImage('https://i.imgur.com/aGv2XKh.jpeg');
+ 
+ welcomeLbl = adminForm.AddNewProLabel(adminPanel, 'welcomeLbl','Welcome to Administrator Panel');
+ welcomeLbl.Align=alMostTop;
+ welcomeLbl.Margins.Left= 50;
+ welcomeLbl.Margins.Bottom=20;
+ welcomeLbl.Margins.Top=20;
+ welcomeLbl.clProSettings.FontSize= 22;
+ welcomeLbl.clProSettings.FontColor= clAlphaColor.clHexToColor('#FFF2D7');
+ 
+
+ adminPanel.clProSettings.IsTransparent = False;
+ adminPanel.SetclProSettings(adminPanel.clProSettings);
+ 
+ welcomeLbl.clProSettings.TextSettings.Font.Style = [fsBold];
+ 
+ welcomeLbl.SetclProSettings(welcomeLbl.clProSettings);
+ 
+ //Choose Book Type
+ comboBoxLbl= adminForm.AddNewProLabel(adminPanel,'comboBoxLbl','Choose Book Type');
+ comboBoxLbl.Align=alCenter;
+ comboBoxLbl.clProSettings.FontColor = clAlphaColor.clHexToColor('FFBB70');
+ comboBoxLbl.clProSettings.FontSize=20;
+ comboBoxLbl.clProSettings.TextSettings.Font.Style = [fsBold];
+ comboBoxLbl.Width = 200;
+ comboBoxLbl.Height = 40;
+ comboBoxLbl.Margins.Top=10;
+ comboBoxLbl.Margins.Left =-60;
+ comboBoxLbl.Margins.Right =70;
+ comboBoxLbl.Margins.Bottom = 600;
+ comboBoxLbl.SetclProSettings(comboBoxLbl.clProSettings);
+ 
+ // Category ComboBox 
+ bookCategoryBox = adminForm.AddNewComboBox(adminPanel,'bookCategoryBox');
+ bookCategoryBox.Align = alCenter;
+ bookCategoryBox.Width = 330;
+ bookCategoryBox.Margins.Top=100;
+ bookCategoryBox.Margins.Left =50;
+ bookCategoryBox.Margins.Right =50;
+ bookCategoryBox.Margins.Bottom = 620;
+  
+ bookCategoryBox.AddItem('Science Fiction','01');
+ bookCategoryBox.AddItem('Romance Novel','02');
+ bookCategoryBox.AddItem('Fantasy','03');
+ bookCategoryBox.AddItem('Horror','04');
+ bookCategoryBox.AddItem('Thriller','05');
+ bookCategoryBox.AddItem('Literary Fiction','06');
+ bookCategoryBox.AddItem('Dystopia','07');
+ bookCategoryBox.AddItem('Magical Realism','08');
+ bookCategoryBox.AddItem('Advanture Fiction','09');
+ bookCategoryBox.AddItem('Memoir','10');
+ bookCategoryBox.AddItem('Comedy','11');
+ bookCategoryBox.AddItem('Mystery','12');
+ 
+ // Kullanıcı adı etiket ayarları
+ usernameLbl= adminForm.AddNewProLabel(adminPanel,'usernameLbl','Enter Username');
+ usernameLbl.clProSettings.FontColor = clAlphaColor.clHexToColor('FFBB70');
+ usernameLbl.clProSettings.FontSize=20;
+ usernameLbl.clProSettings.TextSettings.Font.Style = [fsBold];
+ usernameLbl.Width = 200;
+ usernameLbl.Height = 40;
+ usernameLbl.Margins.Top=80;
+ usernameLbl.Margins.Left =-60;
+ usernameLbl.Margins.Right =70;
+ usernameLbl.Margins.Bottom = 500;
+ usernameLbl.SetclProSettings(usernameLbl.clProSettings);
+
+ /*// Kullanıcı adı alma edit
+ usernameEdt2 = adminForm.AddNewProEdit(adminPanel, 'usernameEdt2', 'Username');
+ usernameEdt2.Align = alCenter;
+ usernameEdt2.Height = 30;
+ usernameEdt2.Width = 330;
+ usernameEdt2.Margins.Top =140;
+ usernameEdt2.Margins.Left = 20;
+ usernameEdt2.Margins.Right = 20;
+ usernameEdt2.Margins.Bottom = 500;
+ 
+ 
+ usernameEdt2.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#ffffff');
+ usernameEdt2.clProSettings.IsFill = True;
+ usernameEdt2.clProSettings.IsRound = True;
+ usernameEdt2.clProSettings.RoundHeight = 10;
+ usernameEdt2.clProSettings.RoundWidth = 10;
+ usernameEdt2.clProSettings.BorderColor = clAlphaColor.clHexToColor('#B43F3F');
+ usernameEdt2.SetclProSettings(usernameEdt2.clProSettings);
+ */
+ 
+ // Kitap İsmi etiket ayarları
+ booknameLbl= adminForm.AddNewProLabel(adminPanel,'booknameLbl','Enter Book Name');
+ booknameLbl.clProSettings.FontColor = clAlphaColor.clHexToColor('FFBB70');
+ booknameLbl.clProSettings.FontSize=20;
+ booknameLbl.clProSettings.TextSettings.Font.Style = [fsBold];
+ booknameLbl.Width = 200;
+ booknameLbl.Height = 40;
+ booknameLbl.Margins.Top=70;
+ booknameLbl.Margins.Left =-60;
+ booknameLbl.Margins.Right =70;
+ booknameLbl.Margins.Bottom = 330;
+ booknameLbl.SetclProSettings(booknameLbl.clProSettings);
+ 
+ // Kitap İsmi edit
+ bookNameEdt = adminForm.AddNewProEdit(adminPanel, 'bookNameEdt', 'Book Name');
+ bookNameEdt.Align = alCenter;
+ bookNameEdt.Height = 30;
+ bookNameEdt.Width = 330;
+ bookNameEdt.Margins.Top =100;
+ bookNameEdt.Margins.Left = 20;
+ bookNameEdt.Margins.Right = 20;
+ bookNameEdt.Margins.Bottom = 300;
+ 
+ bookNameEdt.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#ffffff');
+ bookNameEdt.clProSettings.IsFill = True;
+ bookNameEdt.clProSettings.IsRound = True;
+ bookNameEdt.clProSettings.RoundHeight = 10;
+ bookNameEdt.clProSettings.RoundWidth = 10;
+ bookNameEdt.clProSettings.BorderColor = clAlphaColor.clHexToColor('#B43F3F');
+ bookNameEdt.SetclProSettings(bookNameEdt.clProSettings);
+ 
+ //Yazar ismi label ayarları
+ 
+ authorLbl= adminForm.AddNewProLabel(adminPanel,'authorLbl','Enter Author Name');
+ authorLbl.clProSettings.FontColor = clAlphaColor.clHexToColor('FFBB70');
+ authorLbl.clProSettings.FontSize=20;
+ authorLbl.clProSettings.TextSettings.Font.Style = [fsBold];
+ authorLbl.Width = 200;
+ authorLbl.Height = 40;
+ authorLbl.Margins.Top=100;
+ authorLbl.Margins.Left =-60;
+ authorLbl.Margins.Right =70;
+ authorLbl.Margins.Bottom = 200;
+ authorLbl.SetclProSettings(authorLbl.clProSettings);
+
+ // Yazar ismi edit
+ authorEdt = adminForm.AddNewProEdit(adminPanel, 'authorEdt', 'Author Name');
+ authorEdt.Align = alCenter;
+ authorEdt.Height = 30;
+ authorEdt.Width = 330;
+ authorEdt.Margins.Top = 60;
+ authorEdt.Margins.Left = 20;
+ authorEdt.Margins.Right = 20;
+ authorEdt.Margins.Bottom = 100;
+ 
+ authorEdt.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#ffffff');
+ authorEdt.clProSettings.IsFill = True;
+ authorEdt.clProSettings.IsRound = True;
+ authorEdt.clProSettings.RoundHeight = 10;
+ authorEdt.clProSettings.RoundWidth = 10;
+ authorEdt.clProSettings.BorderColor = clAlphaColor.clHexToColor('#B43F3F');
+ authorEdt.SetclProSettings(authorEdt.clProSettings);
+
+ //Kitap sayfa sayısı label ayarları
+ 
+ pageLbl= adminForm.AddNewProLabel(adminPanel,'pageLbl','Enter Number of Pages');
+ pageLbl.clProSettings.FontColor = clAlphaColor.clHexToColor('FFBB70');
+ pageLbl.clProSettings.FontSize=20;
+ pageLbl.clProSettings.TextSettings.Font.Style = [fsBold];
+ pageLbl.Width = 250;
+ pageLbl.Height = 40;
+ pageLbl.Margins.Top=180;
+ pageLbl.Margins.Left =-10;
+ pageLbl.Margins.Right =70;
+ pageLbl.Margins.Bottom = 120;
+ pageLbl.SetclProSettings(pageLbl.clProSettings);
+
+ // Kitap sayfa sayısı edit
+ pageEdt = adminForm.AddNewProEdit(adminPanel, 'pageEdt', 'Enter Number of Pages');
+ pageEdt.Align = alCenter;
+ pageEdt.Height = 30;
+ pageEdt.Width = 330;
+ pageEdt.Margins.Top = 210;
+ pageEdt.Margins.Left = 20;
+ pageEdt.Margins.Right = 20;
+ pageEdt.Margins.Bottom = 80;
+ 
+ pageEdt.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#ffffff');
+ pageEdt.clProSettings.IsFill = True;
+ pageEdt.clProSettings.IsRound = True;
+ pageEdt.clProSettings.RoundHeight = 10;
+ pageEdt.clProSettings.RoundWidth = 10;
+ pageEdt.clProSettings.BorderColor = clAlphaColor.clHexToColor('#B43F3F');
+ pageEdt.SetclProSettings(pageEdt.clProSettings);
+ 
+ // Gönder buton ayarları
+ 
+ submitBtn = adminForm.AddNewProButton(adminPanel, 'submitBtn', 'Submit');
+ submitBtn.Align = alCenter;
+ submitBtn.Height = 30;
+ submitBtn.Width = 150;
+ submitBtn.Margins.Top = 340;
+ submitBtn.Margins.Left = 20;
+ submitBtn.Margins.Right = 20;
+ submitBtn.Margins.Bottom = 60;
+ 
+ submitBtn.clProSettings.RoundWidth = 10;
+ submitBtn.clProSettings.RoundHeight = 10;
+ submitBtn.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#ED9455');
+ submitBtn.SetclProSettings(submitBtn.clProSettings);
+ 
+ adminForm.AddNewEvent(submitBtn, tbeOnClick, 'SaveButtonClick');
+ Clomosy.DBSQLiteConnect(Clomosy.AppFilesPath + 'ClomosyDatabase1.db3', '');
+  
+ CreateTableBooks;
+ 
+ Combo1 = adminForm.AddNewComboBox(adminForm, 'Combo1');
+ Combo1.Align = alCenter;
+ Combo1.Width = 330;
+ combo1.Height = 30;
+ Combo1.Margins.Top =140;
+ Combo1.Margins.Left = 20;
+ Combo1.Margins.Right = 20;
+ Combo1.Margins.Bottom = 450;
+ 
+ combo1DataLoad;
+ 
+ 
+ 
+ adminForm.Run;
+}

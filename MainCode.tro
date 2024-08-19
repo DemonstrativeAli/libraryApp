@@ -1,0 +1,281 @@
+var
+  LoginForm: TclForm;
+  usernameEdit, passwordEdit: TclProEdit;
+  loginButton, registerButton, LoginHiddenPasswordBtn, LoginPasswordBtn: TClProButton;
+  loginPanel: TclProPanel;
+  registerLbl: TClProLabel;
+  UnitRegister, UnitProfile, AdminPanel, UserPanel: TclUnit;
+  libraryImg, usernameImg, passwordImg: TClProImage;
+  LoginQuery: TclSQLiteQuery; 
+  
+  void LoginHiddenPasswordBtnClick;
+{
+  if not Assigned(LoginPasswordBtn) 
+  {
+    LoginPasswordBtn = LoginForm.AddNewProButton(passwordEdit, 
+'LoginPasswordBtn', '');
+    LoginPasswordBtn.Align = alRight;
+    LoginPasswordBtn.Margins.Right = 10;
+    LoginPasswordBtn.Margins.Top = 5;
+    LoginPasswordBtn.Margins.Bottom = 5;
+    LoginPasswordBtn.Width = 25;
+    LoginPasswordBtn.Height =30;
+    LoginForm.SetImage(LoginPasswordBtn, 'https://i.imgur.com/3h7ewO1.png');
+    LoginForm.AddNewEvent(LoginPasswordBtn, tbeOnClick, 'LoginPasswordBtnClick');
+  }
+  else
+  {
+    LoginPasswordBtn.Visible = True;
+  }
+
+  passwordEdit.Password = False;
+  LoginHiddenPasswordBtn.Visible = False;
+}
+
+
+void LoginPasswordBtnClick;
+{
+  try
+    if not Assigned(LoginHiddenPasswordBtn) 
+    {
+      LoginHiddenPasswordBtn = LoginForm.AddNewProButton(passwordEdit, 'LoginHiddenPasswordBtn', '');
+      LoginHiddenPasswordBtn.Align = alRight;
+      LoginHiddenPasswordBtn.Margins.Right = 10;
+      LoginHiddenPasswordBtn.Margins.Top = 5;
+      LoginHiddenPasswordBtn.Margins.Bottom = 5;
+      LoginHiddenPasswordBtn.Width = 25;
+      LoginHiddenPasswordBtn.Height = 30;
+      LoginForm.SetImage(LoginHiddenPasswordBtn, 'https://i.imgur.com/dQ1keru.png');
+      LoginForm.AddNewEvent(LoginHiddenPasswordBtn, tbeOnClick, 'LoginHiddenPasswordBtnClick');
+    }
+    else
+    {
+      LoginHiddenPasswordBtn.Visible = True;
+    }
+
+    passwordEdit.Password = True;
+    LoginPasswordBtn.Visible = False;
+  except
+    ShowMessage('Exception Class: ' + LastExceptionClassName + ' Exception Message: ' + LastExceptionMessage);
+  }
+}
+
+  
+  void goToAdminPanel
+  {
+    // Giriş işlemleri burada yapılacak
+          LoginForm.clShow;
+          AdminPanel.UnitName = 'AdminPanel';
+          AdminPanel.CallerForm = LoginForm;
+          AdminPanel.Run;
+  }
+  
+  void goToUserPanel
+  {
+    // Giriş işlemleri burada yapılacak
+          LoginForm.clShow;
+          UserPanel.UnitName = 'UserPanel';
+          UserPanel.CallerForm = LoginForm;
+          UserPanel.Run;
+  }
+  
+void btnLoginOnClick;
+{
+  try
+    LoginQuery = Clomosy.DBSQLiteQueryWith(
+      'SELECT * FROM Category WHERE Username = ' 
+      + QuotedStr(usernameEdit.Text) 
+      + ' AND Password = ' 
+      + QuotedStr(passwordEdit.Text)
+    );
+    LoginQuery.OpenOrExecute;
+    
+    if(LoginQuery.Found)
+    {
+      if ((usernameEdit.Text == 'aliberkaysasi') && (passwordEdit.Text == 'a12345'))
+        goToAdminPanel;
+      else
+        goToUserPanel;
+    }
+    else
+      ShowMessage('Username or password is incorrect!');
+      
+  except
+    ShowMessage('Exception class: ' + LastExceptionClassName + ' Exception Message: ' + LastExceptionMessage);
+  }
+}
+
+  
+
+  void OnLoginClick;
+{
+  if ((usernameEdit.Text == 'admin') && (passwordEdit.Text == '1234'))
+    ShowMessage('Login successful!')
+  else
+    ShowMessage('Invalid username or password.');
+}
+
+  void OnRegisterClick;
+{
+  LoginForm.clShow;
+  UnitRegister.UnitName = 'UnitRegister';
+  UnitRegister.CallerForm = LoginForm;
+  UnitRegister.Run;
+}
+
+{
+  LoginForm = TclForm.Create(Self);
+  UnitRegister = TclUnit.Create;
+  AdminPanel = TclUnit.Create;
+  UserPanel = TclUnit.Create;
+  LoginForm.SetFormBGImage('https://i.imgur.com/gtpgxsO.jpeg');
+
+  // Panel görüntü ayarları
+  loginPanel = LoginForm.AddNewProPanel(LoginForm, 'loginPanel');
+  loginPanel.Align = alClient;
+  loginPanel.clProSettings.IsTransparent = True;
+  loginPanel.SetclProSettings(loginPanel.clProSettings);
+  
+  // Resim ayarları
+  
+  libraryImg = LoginForm.AddNewProImage(LoginForm, '');
+  libraryImg.clProSettings.PictureSource = 'https://i.imgur.com/fVSkeNx.png';
+  libraryImg.Align = alCenter;
+  libraryImg.Height = 200;
+  libraryImg.Width = 300;
+  libraryImg.Margins.Bottom =500;
+  libraryImg.SetclProSettings(libraryImg.clProSettings);
+  
+
+  // Kullanıcı adı edit ayarları
+  usernameEdit = LoginForm.AddNewProEdit(loginPanel, 'usernameEdit', 'Username');
+  usernameEdit.Align = alTop;
+  usernameEdit.Height = 50;
+  usernameEdit.Margins.Top =280;
+  usernameEdit.Margins.Left = 20;
+  usernameEdit.Margins.Right = 20;
+
+  usernameEdit.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#DEAC80');
+  usernameEdit.clProSettings.IsTransparent = True;
+  usernameEdit.clProSettings.IsFill = True;
+  usernameEdit.clProSettings.IsRound = True;
+  usernameEdit.clProSettings.RoundHeight = 10;
+  usernameEdit.clProSettings.RoundWidth = 10;
+  usernameEdit.clProSettings.BorderColor = clAlphaColor.clHexToColor('#B43F3F');
+  
+  usernameEdit.SetclProSettings(usernameEdit.clProSettings);
+  
+  // Kullanıcı adı resim ayarları
+  usernameImg = LoginForm.AddNewProImage(usernameEdit,'usernameImg');
+  usernameImg.Align = alLeft;
+  usernameImg.Margins.Left = 10;
+  usernameImg.Margins.Top = 5;
+  usernameImg.Margins.Bottom =5;
+  usernameImg.Width = 25;
+  LoginForm.SetImage(usernameImg,'https://i.imgur.com/CJDw96b.png');
+  
+
+  // Şifre edit ayarları
+  passwordEdit = LoginForm.AddNewProEdit(loginPanel, 'passwordEdit', 'Password');
+  passwordEdit.Align = alTop;
+  passwordEdit.Height = 50;
+  passwordEdit.Margins.Top = 10;
+  passwordEdit.Margins.Left = 20;
+  passwordEdit.Margins.Right = 20;
+
+  passwordEdit.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#DEAC80');
+  passwordEdit.clProSettings.IsTransparent = True;
+  passwordEdit.clProSettings.IsFill = True;
+  passwordEdit.clProSettings.IsRound = True;
+  passwordEdit.clProSettings.RoundHeight = 10;
+  passwordEdit.clProSettings.RoundWidth = 10;
+  passwordEdit.clProSettings.BorderColor = clAlphaColor.clHexToColor('#B43F3F');
+  
+  passwordEdit.SetclProSettings(passwordEdit.clProSettings);
+  
+  // Şifre resim ayarları
+  passwordImg = LoginForm.AddNewProImage(passwordEdit, 'passwordImg');
+  passwordImg.Align = alLeft;
+  passwordImg.Margins.Left = 10;
+  passwordImg.Margins.Top = 5;
+  passwordImg.Margins.Bottom =5;
+  passwordImg.Width = 25;
+  LoginForm.SetImage(passwordImg,'https://i.imgur.com/68SMyTM.png');
+  
+  LoginHiddenPasswordBtn = LoginForm.AddNewProButton(passwordEdit,'LoginHiddenPasswordBtn', '');
+  LoginHiddenPasswordBtn.Align = alRight;
+  LoginHiddenPasswordBtn.Margins.Right = 10 ;
+  LoginHiddenPasswordBtn.Margins.Top =5 ;
+  LoginHiddenPasswordBtn.Margins.Bottom = 5 ;
+  LoginHiddenPasswordBtn.Width = 25;
+  LoginForm.SetImage(LoginHiddenPasswordBtn,'https://i.imgur.com/dQ1keru.png');
+  
+
+  // Giriş yap butonu ayarları
+  loginButton = LoginForm.AddNewProButton(loginPanel, 'loginButton', 'Login');
+  loginButton.Align = alCenter;
+  loginButton.Height = 40;
+  loginButton.Width = loginPanel.Width * 40 / 100;
+  loginButton.Margins.Top = 10;
+  loginButton.Margins.Bottom = 200;
+  loginButton.Margins.Left = 20;
+  loginButton.Margins.Right = 20;
+
+  loginButton.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#DEF9C4');
+  loginButton.clProSettings.IsTransparent = True;
+  loginButton.clProSettings.IsFill = True;
+  loginButton.clProSettings.IsRound = True;
+  loginButton.clProSettings.RoundHeight = 10;
+  loginButton.clProSettings.RoundWidth = 10;
+  loginButton.clProSettings.BorderColor = clAlphaColor.clHexToColor('#B43F3F');
+
+  LoginForm.AddNewEvent(loginButton, tbeOnClick, 'btnLoginOnClick');
+  loginButton.SetclProSettings(loginButton.clProSettings);
+
+  // Kayıt ol butonu ayarları
+  registerButton = LoginForm.AddNewProButton(loginPanel, 'registerButton', 'Register');
+  registerButton.Align = alCenter;
+  registerButton.Height = 30;
+  registerButton.Width = loginPanel.Width * 30 / 100;
+  registerButton.Margins.Top = 180;
+  registerButton.Margins.Left = 10;
+  registerButton.Margins.Right = 10;
+
+  registerButton.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#FF8225');
+  registerButton.clProSettings.IsTransparent = True;
+  registerButton.clProSettings.IsFill = True;
+  registerButton.clProSettings.IsRound = True;
+  registerButton.clProSettings.RoundHeight = 10;
+  registerButton.clProSettings.RoundWidth = 10;
+  registerButton.clProSettings.BorderColor = clAlphaColor.clHexToColor('#B43F3F');
+ 
+  registerButton.SetclProSettings(registerButton.clProSettings);
+  
+  // Kayıt ol Label ayarları
+  registerLbl = LoginForm.AddNewProLabel(loginPanel, 'registerLbl', 'Dont have an account?');
+  registerLbl.Align = alCenter;
+  registerLbl.Height = 30;
+  registerLbl.Width = 190;
+  registerLbl.Margins.Top = 80;
+  registerLbl.Margins.Left = 20;
+  registerLbl.Margins.Right = 20;
+  registerLbl.clProSettings.FontSize = 17;
+  registerLbl.clProSettings.FontColor = clAlphaColor.clHexToColor('#fbd5d5');
+  registerLbl.clProSettings.TextSettings.Font.Style = [fsBold,fsItalic];
+  registerLbl.SetclProSettings(registerLbl.clProSettings);
+
+  LoginForm.AddNewEvent(registerButton, tbeOnClick, 'OnRegisterClick');
+  
+  LoginForm.AddNewEvent(LoginHiddenPasswordBtn,tbeOnClick,'LoginHiddenPasswordBtnClick');
+
+  
+  Clomosy.DBSQLiteConnect(Clomosy.AppFilesPath + 'ClomosyDatabase1.db3', '');
+
+
+  LoginForm.Run;
+}
+
+
+
+
+

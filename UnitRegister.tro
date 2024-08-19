@@ -1,0 +1,318 @@
+var
+  RegisterForm: TclForm;
+  newUsernameEdit,newName, newLastName, newPasswordEdit, newmailEdit, ageEdit: TclProEdit;
+  submitButton, RegisterHiddenPasswordBtn, RegisterPasswordBtn : TClProButton;
+  registerPanel: TclProPanel;
+  libraryImg1,regpasswordImg, regusernameImg, emailImg, regnameImg, ageImg, surnameImg : TClProImage;
+  insertQuery: TclSQLiteQuery;
+  vertscroll : TCLVertScrollBox;
+  database, Password1 : String;
+  
+  void RegisterHiddenPasswordBtnClick;
+{
+  if not Assigned(RegisterPasswordBtn) 
+  {
+    RegisterPasswordBtn = RegisterForm.AddNewProButton(newPasswordEdit, 'RegisterPasswordBtn', '');
+    RegisterPasswordBtn.Align = alRight;
+    RegisterPasswordBtn.Margins.Right = 10;
+    RegisterPasswordBtn.Margins.Top = 5;
+    RegisterPasswordBtn.Margins.Bottom = 5;
+    RegisterPasswordBtn.Width = 25;
+    RegisterPasswordBtn.Height =30;
+    RegisterForm.SetImage(RegisterPasswordBtn, 'https://i.imgur.com/3h7ewO1.png');
+    RegisterForm.AddNewEvent(RegisterPasswordBtn, tbeOnClick, 'RegisterPasswordBtnClick');
+  }
+  else
+  {
+    RegisterPasswordBtn.Visible = True;
+  }
+
+  newPasswordEdit.Password = False;
+  RegisterHiddenPasswordBtn.Visible = False;
+}
+
+
+void RegisterPasswordBtnClick;
+{
+  try
+    if not Assigned(RegisterHiddenPasswordBtn) 
+    {
+      RegisterHiddenPasswordBtn = RegisterForm.AddNewProButton(newPasswordEdit, 'RegisterHiddenPasswordBtn', '');
+      RegisterHiddenPasswordBtn.Align = alRight;
+      RegisterHiddenPasswordBtn.Margins.Right = 10;
+      RegisterHiddenPasswordBtn.Margins.Top = 5;
+      RegisterHiddenPasswordBtn.Margins.Bottom = 5;
+      RegisterHiddenPasswordBtn.Width = 25;
+      RegisterHiddenPasswordBtn.Height = 30;
+      RegisterForm.SetImage(RegisterHiddenPasswordBtn, 'https://i.imgur.com/dQ1keru.png');
+      RegisterForm.AddNewEvent(RegisterHiddenPasswordBtn, tbeOnClick, 'RegisterHiddenPasswordBtnClick');
+    }
+    else
+    {
+      RegisterHiddenPasswordBtn.Visible = True;
+    }
+
+    newPasswordEdit.Password = True;
+    RegisterPasswordBtn.Visible = False;
+  except
+    ShowMessage('Exception Class: ' + LastExceptionClassName + ' Exception Message: ' + LastExceptionMessage);
+  }
+}
+
+
+void CreateTable;
+{
+  database = Clomosy.AppFilesPath + 'ClomosyDatabase1.db3';    
+  Password1 = '';
+  
+  try
+    Clomosy.DBSQLiteConnect(database, Password1);
+    Clomosy.DBSQLiteQuery.Sql.Text = 'CREATE TABLE IF NOT EXISTS Category (Email TEXT NOT NULL, Username TEXT NOT NULL, Name TEXT NOT NULL, LastName TEXT NOT NULL, Age FLOAT NOT NULL, Password TEXT NOT NULL)';
+    Clomosy.DBSQLiteQuery.OpenOrExecute;
+    
+  except
+    ShowMessage('Exception Class: '+LastExceptionClassName+' Exception Message: '+LastExceptionMessage);
+  }
+}
+  void InsertDataBase;
+{
+
+  try
+    Clomosy.DBSQLiteQuery.SQL.Text =
+      'INSERT INTO Category (Email, Username, Name, LastName, Age, Password) ' +
+      'VALUES (' +
+      QuotedStr(newmailEdit.Text) + ',' +
+      QuotedStr(newUsernameEdit.Text) + ',' +
+      QuotedStr(newName.Text) + ',' +
+      QuotedStr(newLastName.Text) + ',' +
+      QuotedStr(ageEdit.Text) + ',' +
+      QuotedStr(newPasswordEdit.Text) +  
+      ');';
+    Clomosy.DBSQLiteQuery.OpenOrExecute;
+    ShowMessage('New User Informations Has Added!');
+  except
+    ShowMessage('Exception Class : ' + LastExceptionClassName + ' Exception Message : ' + LastExceptionMessage);
+  }
+}
+
+  
+
+{
+  RegisterForm = TclForm.Create(Self);
+  RegisterForm.SetFormBGImage('https://i.imgur.com/gtpgxsO.jpeg');
+  
+
+
+  // Panel görüntü ayarları
+  
+  registerPanel = RegisterForm.AddNewProPanel(RegisterForm, 'registerPanel');
+  registerPanel.Align = alClient;
+  registerPanel.SetclProSettings(registerPanel.clProSettings);
+  
+  // E-Posta Edit ayarları
+  
+  newmailEdit = RegisterForm.AddNewProEdit(registerPanel, 'newmailEdit', 'E-Mail');
+  newmailEdit.Align = alCenter;
+  newmailEdit.Height = 40;
+  newmailEdit.Width = 350;
+  newmailEdit.Margins.Top = 20;
+  newmailEdit.Margins.Left = 20;
+  newmailEdit.Margins.Right = 20;
+  newmailEdit.Margins.Bottom = 300;
+
+  newmailEdit.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#DEAC80');
+  newmailEdit.clProSettings.IsTransparent = True;
+  newmailEdit.clProSettings.IsFill = True;
+  newmailEdit.clProSettings.IsRound = True;
+  newmailEdit.clProSettings.RoundHeight = 10;
+  newmailEdit.clProSettings.RoundWidth = 10;
+  newmailEdit.SetclProSettings(newmailEdit.clProSettings);    
+  
+  emailImg = RegisterForm.AddNewProImage(newmailEdit, 'emailImg');
+  emailImg.Align = alLeft;
+  emailImg.Margins.Left = 10;
+  emailImg.Margins.Top = 5;
+  emailImg.Margins.Bottom =5;
+  emailImg.Width = 25;
+  RegisterForm.SetImage(emailImg,'https://i.imgur.com/2ctBlpL.png');
+  
+
+  // Kullanıcı adı edit ayarları
+  
+  newUsernameEdit = RegisterForm.AddNewProEdit(registerPanel, 'newUsernameEdit', 'New Username');
+  newUsernameEdit.Align = alCenter;
+  newUsernameEdit.Height = 40;
+  newUsernameEdit.Width = 350;
+  newUsernameEdit.Margins.Top = 20;
+  newUsernameEdit.Margins.Left = 20;
+  newUsernameEdit.Margins.Right = 20;
+  newUsernameEdit.Margins.Bottom = 200;
+
+  newUsernameEdit.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#DEAC80');
+  newUsernameEdit.clProSettings.IsTransparent = True;
+  newUsernameEdit.clProSettings.IsFill = True;
+  newUsernameEdit.clProSettings.IsRound = True;
+  newUsernameEdit.clProSettings.RoundHeight = 10;
+  newUsernameEdit.clProSettings.RoundWidth = 10;
+  newUsernameEdit.SetclProSettings(newUsernameEdit.clProSettings);
+  
+  // Kullanıcı adı resim ayarları
+  regusernameImg = RegisterForm.AddNewProImage(newUsernameEdit,'regusernameImg');
+  regusernameImg.Align = alLeft;
+  regusernameImg.Margins.Left = 10;
+  regusernameImg.Margins.Top = 5;
+  regusernameImg.Margins.Bottom =5;
+  regusernameImg.Width = 25;
+  RegisterForm.SetImage(regusernameImg,'https://i.imgur.com/CJDw96b.png');
+  
+  // Ad ayarları
+  newName = RegisterForm.AddNewProEdit(RegisterForm, 'newName', 'Name');
+  newName.Align = alCenter;
+  newName.Height = 40;
+  newName.Width = 350;
+  newName.Margins.Top = 20;
+  newName.Margins.Left = 20;
+  newName.Margins.Right = 20;
+  newName.Margins.Bottom = 100;
+
+  newName.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#DEAC80');
+  newName.clProSettings.IsTransparent = True;
+  newName.clProSettings.IsFill = True;
+  newName.clProSettings.IsRound = True;
+  newName.clProSettings.RoundHeight = 10;
+  newName.clProSettings.RoundWidth = 10;
+  newName.SetclProSettings(newName.clProSettings);  
+  
+  regnameImg = RegisterForm.AddNewProImage(newName,'regnameImg');
+  regnameImg.Align = alLeft;
+  regnameImg.Margins.Left = 10;
+  regnameImg.Margins.Top = 5;
+  regnameImg.Margins.Bottom =5;
+  regnameImg.Width = 25;
+  RegisterForm.SetImage(regnameImg,'https://i.imgur.com/6hFQNtP.png');
+  
+  // Soyad ayarları
+  newLastName = RegisterForm.AddNewProEdit(RegisterForm, 'newLastName', 'Last Name');
+  newLastName.Align = alCenter;
+  newLastName.Height = 40;
+  newLastName.Width = 350;
+  newLastName.Margins.Top = 20;
+  newLastName.Margins.Left = 20;
+  newLastName.Margins.Right = 20;
+
+  newLastName.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#DEAC80');
+  newLastName.clProSettings.IsTransparent = True;
+  newLastName.clProSettings.IsFill = True;
+  newLastName.clProSettings.IsRound = True;
+  newLastName.clProSettings.RoundHeight = 10;
+  newLastName.clProSettings.RoundWidth = 10;
+  newLastName.SetclProSettings(newLastName.clProSettings);   
+  
+  surnameImg = RegisterForm.AddNewProImage(newLastName,'surnameImg');
+  surnameImg.Align = alLeft;
+  surnameImg.Margins.Left = 10;
+  surnameImg.Margins.Top = 5;
+  surnameImg.Margins.Bottom =5;
+  surnameImg.Width = 25;
+  RegisterForm.SetImage(surnameImg,'https://i.imgur.com/UnLSrBD.png');
+  
+  
+  // Yaş edit ayarları
+  
+  ageEdit = RegisterForm.AddNewProEdit(registerPanel, 'ageEdit', 'Age');
+  ageEdit.Align = alCenter;
+  ageEdit.Height = 40;
+  ageEdit.Width = 350;
+  ageEdit.Margins.Top = 120;
+  ageEdit.Margins.Left = 20;
+  ageEdit.Margins.Right = 20;
+
+  ageEdit.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#DEAC80');
+  ageEdit.clProSettings.IsTransparent = True;
+  ageEdit.clProSettings.IsFill = True;
+  ageEdit.clProSettings.IsRound = True;
+  ageEdit.clProSettings.RoundHeight = 10;
+  ageEdit.clProSettings.RoundWidth = 10;
+  ageEdit.SetclProSettings(ageEdit.clProSettings);    
+  
+  ageImg = RegisterForm.AddNewProImage(ageEdit,'ageImg');
+  ageImg.Align = alLeft;
+  ageImg.Margins.Left = 10;
+  ageImg.Margins.Top = 5;
+  ageImg.Margins.Bottom =5;
+  ageImg.Width = 25;
+  RegisterForm.SetImage(ageImg,'https://i.imgur.com/w7L2UQX.png');
+  
+
+  // Şifre edit ayarları
+  
+  newPasswordEdit = RegisterForm.AddNewProEdit(registerPanel, 'newPasswordEdit', 'New Password');
+  newPasswordEdit.Align = alCenter;
+  newPasswordEdit.Height = 40;
+  newPasswordEdit.Width = 350;
+  newPasswordEdit.Margins.Top = 220;
+  newPasswordEdit.Margins.Left = 20;
+  newPasswordEdit.Margins.Right = 20;
+
+  newPasswordEdit.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#DEAC80');
+  newPasswordEdit.clProSettings.IsTransparent = True;
+  newPasswordEdit.clProSettings.IsFill = True;
+  newPasswordEdit.clProSettings.IsRound = True;
+  newPasswordEdit.clProSettings.RoundHeight = 10;
+  newPasswordEdit.clProSettings.RoundWidth = 10;
+  newPasswordEdit.SetclProSettings(newPasswordEdit.clProSettings);
+  
+  // Şifre resim ayarları
+  regpasswordImg = RegisterForm.AddNewProImage(newPasswordEdit, 'passwordImg');
+  regpasswordImg.Align = alLeft;
+  regpasswordImg.Margins.Left = 10;
+  regpasswordImg.Margins.Top = 5;
+  regpasswordImg.Margins.Bottom =5;
+  regpasswordImg.Width = 25;
+  RegisterForm.SetImage(regpasswordImg,'https://i.imgur.com/68SMyTM.png');
+  
+  RegisterHiddenPasswordBtn = RegisterForm.AddNewProButton(newPasswordEdit,'RegisterHiddenPasswordBtn', '');
+  RegisterHiddenPasswordBtn.Align = alRight;
+  RegisterHiddenPasswordBtn.Margins.Right = 10 ;
+  RegisterHiddenPasswordBtn.Margins.Top =5 ;
+  RegisterHiddenPasswordBtn.Margins.Bottom = 5 ;
+  RegisterHiddenPasswordBtn.Width = 25;
+  RegisterForm.SetImage(RegisterHiddenPasswordBtn,'https://i.imgur.com/dQ1keru.png');
+
+  // Kayıt ol butonu ayarları
+  
+  submitButton = RegisterForm.AddNewProButton(registerPanel, 'submitButton', 'Submit');
+  submitButton.Align = alCenter;
+  submitButton.Height = 30;
+  submitButton.Width = 120;
+  submitButton.Margins.Top = 400;
+  submitButton.Margins.Left = 20;
+  submitButton.Margins.Right = 20;
+  submitButton.Margins.Bottom = 10;
+
+  submitButton.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#FF8225');
+  submitButton.clProSettings.IsTransparent = True;
+  submitButton.clProSettings.IsFill = True;
+  submitButton.clProSettings.IsRound = True;
+  submitButton.clProSettings.RoundHeight = 10;
+  submitButton.clProSettings.RoundWidth = 10;
+  submitButton.SetclProSettings(submitButton.clProSettings);
+  RegisterForm.AddNewEvent(submitButton, tbeOnClick, 'InsertDataBase');
+  
+  // Resim ayarları
+  
+  libraryImg1 = RegisterForm.AddNewProImage(RegisterForm, '');
+  libraryImg1.clProSettings.PictureSource = 'https://i.imgur.com/fVSkeNx.png';
+  libraryImg1.Align = alCenter;
+  libraryImg1.Height = 300;
+  libraryImg1.Width = 300;
+  libraryImg1.Margins.Bottom = 600;
+  libraryImg1.SetclProSettings(libraryImg1.clProSettings);
+  
+  RegisterForm.AddNewEvent(RegisterHiddenPasswordBtn,tbeOnClick,'RegisterHiddenPasswordBtnClick');
+
+  
+  CreateTable;
+  
+  RegisterForm.Run;
+}

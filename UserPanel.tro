@@ -1,0 +1,47 @@
+Var   
+  MyForm:TclForm;
+  LstView : TClListView;
+  selectQuery : TclSQLiteQuery;
+  database, Password1 : String;
+  
+  
+  
+  
+  
+void AddDataToListview
+{
+  try
+    selectQuery= Clomosy.DBSQLiteQueryWith( 'SELECT BookID as RECORD_GUID, BookName as MAIN_TEXT, AuthorName as SUB_TEXT, BookType as FOOTER_TEXT, Username1 as SIDE_TEXT_BOTTOM, NmbPage as SIDE_TEXT_CENTER FROM Book2');
+    selectQuery.OpenOrExecute;
+    if (selectQuery.Found)
+    {
+      LstView.clLoadListViewDataFromDataset(selectQuery);
+    }
+    else
+    {
+      ShowMessage('No record found!');
+    }
+  finally
+    selectQuery.Free;
+  }
+}
+
+{
+  MyForm = TclForm.Create(Self);
+  MyForm.SetFormBGImage('https://i.imgur.com/aGv2XKh.jpeg');
+
+  LstView = MyForm.AddNewListView(MyForm,'LstView');
+  LstView.Align = alClient;
+
+
+  
+  Clomosy.DBSQLiteConnect(Clomosy.AppFilesPath + 'ClomosyDatabase1.db3', '');
+
+  
+  AddDataToListview;
+  MyForm.Run;
+}
+
+ 
+ 
+ 
