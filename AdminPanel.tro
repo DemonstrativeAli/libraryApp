@@ -18,7 +18,7 @@ var
     Clomosy.DBSQLiteConnect(Clomosy.AppFilesPath + 'ClomosyDatabase1.db3', '');
 
 
-    // Veritabanından şehir bilgilerini çek
+    // Veritabanından kullanıcı bilgilerini çek
     qrySubmit = Clomosy.DBSQLiteQueryWith('SELECT Username, Email FROM Category');
     qrySubmit.OpenOrExecute;
 
